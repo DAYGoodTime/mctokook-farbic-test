@@ -16,6 +16,9 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
+	maven { url 'https://maven.architectury.dev/' }
+	maven { url = 'https://jitpack.io' }
+	gradlePluginPortal()
 }
 
 loom {
@@ -29,6 +32,17 @@ loom {
 	}
 
 }
+// Add the generated resources to the main source set
+sourceSets {
+	main {
+		resources {
+			srcDirs += [
+					'src/main/generated'
+			]
+		}
+	}
+}
+sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
 	// To change the versions see the gradle.properties file
@@ -38,7 +52,10 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	
+	implementation 'com.github.SNWCreations:Kookbc:0.27.2',{
+		exclude group: 'net.fabricmc' ,module: 'sponge-mixin'
+	}
+	implementation "cn.hutool:hutool-all:5.8.20"
 	// Uncomment the following line to enable the deprecated Fabric API modules. 
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
 
@@ -62,16 +79,16 @@ java {
 	// if it is present.
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
-
 	sourceCompatibility = JavaVersion.VERSION_17
 	targetCompatibility = JavaVersion.VERSION_17
 }
-
 jar {
 	from("LICENSE") {
 		rename { "${it}_${project.base.archivesName.get()}"}
 	}
+	exclude 'META-INF/services/**'
 }
+
 
 // configure the maven publication
 publishing {
